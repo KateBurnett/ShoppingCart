@@ -61,7 +61,7 @@ const Products = (props) => {
   //  Fetch Data
   const { Fragment, useState, useEffect} = React;
   const [query, setQuery] = useState("http://localhost:1337/api/products");
-  const [{ data, isLoading }, doFetch] = useDataApi(
+  const [{ data }, fetchData] = useDataApi(
     "http://localhost:1337/api/products",
     {
       data: [],
@@ -139,7 +139,7 @@ const Products = (props) => {
 
   //TODO: implement the restockProducts function
   const restockProducts = (url) => {
-    let data = doFetch(url);
+    let data = fetchData(url);
     // now the error is "doFetch is not a function" but we don't see the same error in the old code which also only uses doFetch in this function and in data/isLoading set state
     console.log("YYYYYYYYYYY");
     console.log(url); // works if we remove doFetch
