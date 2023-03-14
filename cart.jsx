@@ -14,6 +14,20 @@ const Cart = (props) => {
   return <Accordion defaultActiveKey="0">{list}</Accordion>;
 };
 
+// const getStrapi = (url) => {
+//   fetch(url)
+//     .then(data=> data.json())
+//     .then(data=>{
+//       data.data.forEach((product)=>{
+//         console.log ("88888888888888888888")
+//         console.log (product.attributes)
+//         console.log ("88888888888888888888") 
+//         return product.attributes
+//       })
+//     }
+//     )
+//   }
+
 const useDataApi = (initialUrl, initialData) => {
   const { useState, useEffect, useReducer } = React;
   const [url, setUrl] = useState(initialUrl);
@@ -24,8 +38,21 @@ const useDataApi = (initialUrl, initialData) => {
     data: initialData,
   });
   console.log(`useDataApi called`);
+  
   useEffect(() => {
     console.log("useEffect Called");
+    fetch(initialUrl)
+    .then(data=> data.json())
+    .then(data=>{
+      data.data.forEach((product)=>{
+        console.log ("____________________")
+        console.log (product.attributes)
+        console.log ("____________________") 
+        return product.attributes
+      })
+     
+      
+    })
     let didCancel = false;
     const fetchData = async () => {
       dispatch({ type: "FETCH_INIT" });
@@ -46,8 +73,11 @@ const useDataApi = (initialUrl, initialData) => {
       didCancel = true;
     };
   }, [url]);
+
   return [state, setUrl];
 };
+
+
 const dataFetchReducer = (state, action) => {
   switch (action.type) {
     case "FETCH_INIT":
@@ -177,8 +207,11 @@ const Products = (props) => {
   };
   const restockProducts = (url) => {
     doFetch(url);
-    let newItems = data.map((item) => {
+    let newItems = data.data.map((item) => {
       let { name, country, cost, instock } = item;
+      console.log(`*****************`);
+      console.log(item);
+      console.log(`*****************`);
       return { name, country, cost, instock };
     });
     setItems([...items, ...newItems]);
@@ -204,9 +237,11 @@ const Products = (props) => {
       <Row>
         <form
           onSubmit={(event) => {
-            restockProducts({query});
-            console.log(`Restock called on ${query}`);
             event.preventDefault();
+            
+            console.log(`Restock called on ${query}`);
+            restockProducts({query});
+            
           }}
         >
           <input
