@@ -151,6 +151,7 @@ const Products = (props) => {
   const photos = ["apple.png", "orange.png", "beans.png", "cabbage.png"];
 
   let list = items.map((item, index) => {
+  //  commented out because the pics are ugly but the code below works if you change <Image src={photos[index % 4]} to <Image src={uhit}
   //   let n = index + 200;
   //   let uhit = "https://picsum.photos/" + n;
     
