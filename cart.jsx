@@ -14,45 +14,37 @@ const Cart = (props) => {
   return <Accordion defaultActiveKey="0">{list}</Accordion>;
 };
 
-// const getStrapi = (url) => {
-//   fetch(url)
-//     .then(data=> data.json())
-//     .then(data=>{
-//       data.data.forEach((product)=>{
-//         console.log ("88888888888888888888")
-//         console.log (product.attributes)
-//         console.log ("88888888888888888888") 
-//         return product.attributes
-//       })
-//     }
-//     )
-//   }
+//=========Fetching Data=============
 
 const useDataApi = (initialUrl, initialData) => {
   const { useState, useEffect, useReducer } = React;
   const [url, setUrl] = useState(initialUrl);
-
+  console.log("IIIIIIIII")
+  console.log(initialData.data)
+//url = strapi
+//inital data = data:[]
   const [state, dispatch] = useReducer(dataFetchReducer, {
     isLoading: false,
     isError: false,
-    data: initialData,
+    data: initialData.data,
   });
   console.log(`useDataApi called`);
   
   useEffect(() => {
     console.log("useEffect Called");
+   var products =""
     fetch(initialUrl)
     .then(data=> data.json())
     .then(data=>{
       data.data.forEach((product)=>{
+        // CL works
         console.log ("____________________")
         console.log (product.attributes)
-        console.log ("____________________") 
-        return product.attributes
+        products = product.attributes
       })
-     
-      
+      console.log(products)
     })
+
     let didCancel = false;
     const fetchData = async () => {
       dispatch({ type: "FETCH_INIT" });
@@ -68,6 +60,7 @@ const useDataApi = (initialUrl, initialData) => {
         }
       }
     };
+
     fetchData();
     return () => {
       didCancel = true;
@@ -104,10 +97,12 @@ const dataFetchReducer = (state, action) => {
   }
 };
 
+//=========Rendered in root=============
+
 const Products = (props) => {
   const [items, setItems] = React.useState(products);
   const [cart, setCart] = React.useState([]);
-  const [total, setTotal] = React.useState(0);
+  //const [total, setTotal] = React.useState(0);
   const {
     Card,
     Accordion,
@@ -118,6 +113,7 @@ const Products = (props) => {
     Image,
     Input,
   } = ReactBootstrap;
+
   //  Fetch Data
   const { Fragment, useState, useEffect, useReducer } = React;
   const [query, setQuery] = useState("http://localhost:1337/api/products");
@@ -127,8 +123,10 @@ const Products = (props) => {
       data: [],
     }
   );
+  
+  // result = {"data":[]}
   console.log(`Rendering Products ${JSON.stringify(data)}`);
-  // Fetch Data
+
   const addToCart = (e) => {
     let name = e.target.name;
     let item = items.filter((item) => item.name == name);
@@ -137,9 +135,9 @@ const Products = (props) => {
     console.log(`add to Cart ${JSON.stringify(item)}`);
     setCart([...cart, ...item]);
   };
+
   const deleteCartItem = (delIndex) => {
     // this is the index in the cart not in the Product List
-
     let newCart = cart.filter((item, i) => delIndex != i);
     let target = cart.filter((item, index) => delIndex == index);
     let newItems = items.map((item, index) => {
@@ -149,15 +147,16 @@ const Products = (props) => {
     setCart(newCart);
     setItems(newItems);
   };
+
   const photos = ["apple.png", "orange.png", "beans.png", "cabbage.png"];
 
   let list = items.map((item, index) => {
-    let n = index + 200;
-    let uhit = "https://picsum.photos/" + n;
+  //   let n = index + 200;
+  //   let uhit = "https://picsum.photos/" + n;
     
     return (
       <li key={index}>
-        <Image src={uhit} width={70} roundedCircle></Image>
+        <Image src={photos[index % 4]} width={70} roundedCircle></Image>
         <Button variant="primary" size="large">
           {item.name}:${item.cost}-Stock={item.instock}
         </Button>
@@ -165,6 +164,7 @@ const Products = (props) => {
       </li>
     );
   });
+  
   let cartList = cart.map((item, index) => {
     return (
       <Card key={index}>
@@ -206,14 +206,19 @@ const Products = (props) => {
     return newTotal;
   };
   const restockProducts = (url) => {
-    doFetch(url);
-    let newItems = data.data.map((item) => {
+
+    console.log(`INSIDE RESTOCK PRODUCTS+++++++++`);
+    console.log(url.query);
+    doFetch(url.query);
+    console.log("products " + products)
+    let newItems = products.map((item) => {
       let { name, country, cost, instock } = item;
       console.log(`*****************`);
-      console.log(item);
-      console.log(`*****************`);
+      console.log(item.attributes);
       return { name, country, cost, instock };
     });
+    console.log("99999999999999999");
+    console.log(newItems);
     setItems([...items, ...newItems]);
   };
 
